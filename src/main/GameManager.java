@@ -6,9 +6,6 @@ import main.model.MatchResult;
 import main.logic.IMatchLogic;
 import main.logic.IGravityLogic;
 import main.logic.ISpecialCandyLogic;
-import main.logic.BasicMatchLogic;
-import main.logic.BasicGravityLogic;
-import main.logic.BasicSpecialCandyLogic;
 import main.animation.AnimationSystem;
 import main.animation.SwapAnimation;
 import main.animation.FallAnimation;
@@ -22,9 +19,9 @@ public class GameManager {
     }
 
     private Board board;
-    private IMatchLogic matchLogic;
-    private IGravityLogic gravityLogic;
-    private ISpecialCandyLogic specialCandyLogic;
+    private final IMatchLogic matchLogic;
+    private final IGravityLogic gravityLogic;
+    private final ISpecialCandyLogic specialCandyLogic;
     private AnimationSystem animationSystem;
     private GamePanel gamePanel;
     private int score;
@@ -35,12 +32,12 @@ public class GameManager {
     
     private int swapR1, swapC1, swapR2, swapC2;
 
-    public GameManager() {
+    public GameManager(IMatchLogic matchLogic, IGravityLogic gravityLogic, ISpecialCandyLogic specialCandyLogic) {
         this.score = 0;
         this.board = new Board(8, 8);
-        this.matchLogic = new BasicMatchLogic();
-        this.gravityLogic = new BasicGravityLogic();
-        this.specialCandyLogic = new BasicSpecialCandyLogic();
+        this.matchLogic = matchLogic;
+        this.gravityLogic = gravityLogic;
+        this.specialCandyLogic = specialCandyLogic;
         this.animationSystem = new AnimationSystem();
     }
 
