@@ -16,7 +16,14 @@ public class FallAnimation extends Animation {
 
     @Override
     public void update() {
-        // TODO: Implement fall animation logic
-        this.finished = true;
+        if (candy.getVisualY() < targetY) {
+            candy.setVisualY(candy.getVisualY() + speed);
+            if (candy.getVisualY() >= targetY) {
+                candy.setVisualY(targetY);
+                this.finished = true;
+            }
+        } else {
+            this.finished = true;
+        }
     }
 }

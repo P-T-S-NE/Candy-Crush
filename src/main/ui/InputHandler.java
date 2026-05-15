@@ -13,7 +13,9 @@ public class InputHandler extends MouseAdapter {
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        // TODO: Map mouse coordinates to grid coordinates
-        // Notify gameManager of the interaction
+        int col = (e.getX() - GamePanel.OFFSET_X) / GamePanel.CELL_SIZE;
+        int row = (e.getY() - GamePanel.OFFSET_Y) / GamePanel.CELL_SIZE;
+        
+        gameManager.selectCandy(row, col);
     }
 }
