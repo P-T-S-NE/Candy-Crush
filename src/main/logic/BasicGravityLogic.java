@@ -1,8 +1,18 @@
 package main.logic;
 
 import main.model.Board;
+import main.model.Candy;
+import main.model.CandyFactory;
+import java.util.ArrayList;
+import java.util.List;
 
 public class BasicGravityLogic implements IGravityLogic {
+
+    private CandyFactory candyFactory;
+
+    public BasicGravityLogic(CandyFactory candyFactory) {
+        this.candyFactory = candyFactory;
+    }
 
     @Override
     public void applyGravity(Board board) {
@@ -22,14 +32,35 @@ public class BasicGravityLogic implements IGravityLogic {
 
     @Override
     public void refill(Board board) {
-        main.model.enums.CandyType[] types = main.model.enums.CandyType.values();
         for (int c = 0; c < board.getCols(); c++) {
             for (int r = 0; r < board.getRows(); r++) {
                 if (board.getCandy(r, c) == null) {
-                    main.model.enums.CandyType randomType = types[(int)(Math.random() * types.length)];
-                    board.setCandy(r, c, new main.model.Candy(randomType, main.model.enums.SpecialType.NONE, r, c));
+                    board.setCandy(r, c, candyFactory.createRandomCandy(r, c));
                 }
             }
         }
+    }
+
+    @Override
+    public List<Candy> generateNewCandies(Board board) {
+        List<Candy> newCandies = new ArrayList<>();
+        for (int c = 0; c < board.getCols(); c++) {
+            int emptyCount = 0;
+            for (int r = board.getRows() - 1; r >= 0; r--) {
+                if (board.getCandy(r, c) == null) emptyCount++;
+            }
+            for (int r = 0; r < board.getRows(); r++) {
+                if (board.getCandy(r, c) == null) {
+                    Candy newCandy = candyFactory.createRandomCandy(r, c);
+                    // Visual position is set higher than logical row based on empty count
+                    // so it drops from above the board
+                    newCandy.setVisualY(r - emptyCount);
+                    newCandy.setVisualX(c);
+                    board.setCandy(r, c, newCandy);
+                    newCandies.add(newCandy);
+                }
+            }
+        }
+        return newCandies;
     }
 }

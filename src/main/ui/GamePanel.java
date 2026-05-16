@@ -3,6 +3,8 @@ package main.ui;
 import main.GameManager;
 import main.model.Board;
 import main.model.Candy;
+import main.model.ScoreManager;
+import main.logic.SelectionController;
 import javax.swing.JPanel;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -11,12 +13,16 @@ import java.awt.Color;
 
 public class GamePanel extends JPanel {
     private GameManager gameManager;
+    private ScoreManager scoreManager;
+    private SelectionController selectionController;
     public static final int CELL_SIZE = 60;
     public static final int OFFSET_X = 50;
     public static final int OFFSET_Y = 50;
 
-    public GamePanel(GameManager gameManager) {
+    public GamePanel(GameManager gameManager, ScoreManager scoreManager, SelectionController selectionController) {
         this.gameManager = gameManager;
+        this.scoreManager = scoreManager;
+        this.selectionController = selectionController;
     }
 
     @Override
@@ -64,26 +70,7 @@ public class GamePanel extends JPanel {
         int y = OFFSET_Y + (int) (candy.getVisualY() * CELL_SIZE);
         int padding = 8;
 
-        switch (candy.getType()) {
-            case RED:
-                g.setColor(new Color(255, 80, 80));
-                break;
-            case BLUE:
-                g.setColor(new Color(80, 180, 255));
-                break;
-            case GREEN:
-                g.setColor(new Color(80, 255, 80));
-                break;
-            case YELLOW:
-                g.setColor(new Color(255, 255, 80));
-                break;
-            case PURPLE:
-                g.setColor(new Color(200, 80, 255));
-                break;
-            case ORANGE:
-                g.setColor(new Color(255, 150, 50));
-                break;
-        }
+        g.setColor(candy.getType().getColor());
 
         g.fillOval(x + padding, y + padding, CELL_SIZE - 2 * padding, CELL_SIZE - 2 * padding);
 
@@ -91,22 +78,12 @@ public class GamePanel extends JPanel {
         g.setColor(new Color(255, 255, 255, 100));
         g.fillOval(x + padding + 5, y + padding + 5, 15, 10);
 
-        if (candy.getSpecialType() == main.model.enums.SpecialType.STRIPED_HORIZONTAL) {
-            g.setColor(Color.WHITE);
-            g.fillRect(x + padding, y + CELL_SIZE / 2 - 2, CELL_SIZE - 2 * padding, 4);
-        } else if (candy.getSpecialType() == main.model.enums.SpecialType.STRIPED_VERTICAL) {
-            g.setColor(Color.WHITE);
-            g.fillRect(x + CELL_SIZE / 2 - 2, y + padding, 4, CELL_SIZE - 2 * padding);
-        } else if (candy.getSpecialType() == main.model.enums.SpecialType.WRAPPED) {
-            g.setColor(Color.WHITE);
-            g.drawRect(x + padding + 5, y + padding + 5, CELL_SIZE - 2 * padding - 10, CELL_SIZE - 2 * padding - 10);
-            g.drawRect(x + padding + 7, y + padding + 7, CELL_SIZE - 2 * padding - 14, CELL_SIZE - 2 * padding - 14);
-        }
+        main.ui.renderer.SpecialCandyRendererRegistry.render(candy.getSpecialType(), g, x, y, CELL_SIZE, padding);
     }
 
     private void drawSelector(Graphics g) {
-        int r = gameManager.getSelectedRow();
-        int c = gameManager.getSelectedCol();
+        int r = selectionController.getSelectedRow();
+        int c = selectionController.getSelectedCol();
         if (r != -1 && c != -1) {
             Graphics2D g2d = (Graphics2D) g;
             g2d.setColor(Color.WHITE);
@@ -118,6 +95,6 @@ public class GamePanel extends JPanel {
 
     private void drawScore(Graphics g) {
         g.setColor(Color.WHITE);
-        g.drawString("Score: " + gameManager.getScore(), 10, 20);
+        g.drawString("Score: " + scoreManager.getScore(), 10, 20);
     }
 }

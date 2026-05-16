@@ -1,14 +1,14 @@
 package main.ui;
 
-import main.GameManager;
+import main.logic.SelectionController;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 public class InputHandler extends MouseAdapter {
-    private GameManager gameManager;
+    private SelectionController selectionController;
 
-    public InputHandler(GameManager gameManager) {
-        this.gameManager = gameManager;
+    public InputHandler(SelectionController selectionController) {
+        this.selectionController = selectionController;
     }
 
     @Override
@@ -16,6 +16,6 @@ public class InputHandler extends MouseAdapter {
         int col = (e.getX() - GamePanel.OFFSET_X) / GamePanel.CELL_SIZE;
         int row = (e.getY() - GamePanel.OFFSET_Y) / GamePanel.CELL_SIZE;
         
-        gameManager.selectCandy(row, col);
+        selectionController.selectCandy(row, col);
     }
 }

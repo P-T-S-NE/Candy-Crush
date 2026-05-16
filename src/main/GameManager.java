@@ -3,6 +3,7 @@ package main;
 import main.model.Board;
 import main.model.Candy;
 import main.model.MatchResult;
+import main.model.ScoreManager;
 import main.logic.IMatchLogic;
 import main.logic.IGravityLogic;
 import main.logic.ISpecialCandyLogic;
@@ -12,7 +13,6 @@ import main.logic.BasicSpecialCandyLogic;
 import main.animation.AnimationSystem;
 import main.animation.SwapAnimation;
 import main.animation.FallAnimation;
-import main.ui.GamePanel;
 import javax.swing.Timer;
 import java.util.List;
 
@@ -26,26 +26,24 @@ public class GameManager {
     private IGravityLogic gravityLogic;
     private ISpecialCandyLogic specialCandyLogic;
     private AnimationSystem animationSystem;
-    private GamePanel gamePanel;
-    private int score;
-    private int selectedRow = -1;
-    private int selectedCol = -1;
+    private ScoreManager scoreManager;
+    private Runnable repaintCallback;
     private GameState state = GameState.IDLE;
     private Timer gameLoop;
     
     private int swapR1, swapC1, swapR2, swapC2;
 
-    public GameManager() {
-        this.score = 0;
+    public GameManager(IMatchLogic matchLogic, IGravityLogic gravityLogic, ISpecialCandyLogic specialCandyLogic, ScoreManager scoreManager) {
         this.board = new Board(8, 8);
-        this.matchLogic = new BasicMatchLogic();
-        this.gravityLogic = new BasicGravityLogic();
-        this.specialCandyLogic = new BasicSpecialCandyLogic();
+        this.matchLogic = matchLogic;
+        this.gravityLogic = gravityLogic;
+        this.specialCandyLogic = specialCandyLogic;
+        this.scoreManager = scoreManager;
         this.animationSystem = new AnimationSystem();
     }
 
-    public void setGamePanel(GamePanel panel) {
-        this.gamePanel = panel;
+    public void setRepaintCallback(Runnable repaintCallback) {
+        this.repaintCallback = repaintCallback;
     }
 
     public void start() {
@@ -71,7 +69,7 @@ public class GameManager {
             }
         }
         
-        if (gamePanel != null) gamePanel.repaint();
+        if (repaintCallback != null) repaintCallback.run();
 
         gameLoop = new Timer(16, e -> update());
         gameLoop.start();
@@ -80,7 +78,7 @@ public class GameManager {
     public void update() {
         if (animationSystem.isAnimating()) {
             animationSystem.update();
-            if (gamePanel != null) gamePanel.repaint();
+            if (repaintCallback != null) repaintCallback.run();
             return;
         }
 
@@ -116,7 +114,7 @@ public class GameManager {
             case IDLE:
                 break;
         }
-        if (gamePanel != null) gamePanel.repaint();
+        if (repaintCallback != null) repaintCallback.run();
     }
 
     private void refillAndAnimate() {
@@ -131,40 +129,18 @@ public class GameManager {
             }
         }
         
-        main.model.enums.CandyType[] types = main.model.enums.CandyType.values();
-        for (int c = 0; c < board.getCols(); c++) {
-            int emptyCount = 0;
-            for (int r = board.getRows() - 1; r >= 0; r--) {
-                if (board.getCandy(r, c) == null) emptyCount++;
-            }
-            for (int r = 0; r < board.getRows(); r++) {
-                if (board.getCandy(r, c) == null) {
-                    main.model.enums.CandyType randomType = types[(int)(Math.random() * types.length)];
-                    Candy newCandy = new main.model.Candy(randomType, main.model.enums.SpecialType.NONE, r, c);
-                    newCandy.setVisualY(r - emptyCount);
-                    newCandy.setVisualX(c);
-                    board.setCandy(r, c, newCandy);
-                    animationSystem.addAnimation(new FallAnimation(newCandy, r, 0.2f));
-                }
-            }
+        List<Candy> newCandies = gravityLogic.generateNewCandies(board);
+        for (Candy newCandy : newCandies) {
+            animationSystem.addAnimation(new FallAnimation(newCandy, newCandy.getRow(), 0.2f));
         }
     }
 
-    public void selectCandy(int row, int col) {
-        if (state != GameState.IDLE) return;
-        if (!board.isInside(row, col)) return;
+    public void requestRepaint() {
+        if (repaintCallback != null) repaintCallback.run();
+    }
 
-        if (selectedRow == -1 && selectedCol == -1) {
-            selectedRow = row;
-            selectedCol = col;
-        } else {
-            if (Math.abs(selectedRow - row) + Math.abs(selectedCol - col) == 1) {
-                handleSwap(selectedRow, selectedCol, row, col);
-            }
-            selectedRow = -1;
-            selectedCol = -1;
-        }
-        if (gamePanel != null) gamePanel.repaint();
+    public boolean isIdle() {
+        return state == GameState.IDLE;
     }
 
     public void handleSwap(int r1, int c1, int r2, int c2) {
@@ -185,7 +161,7 @@ public class GameManager {
         for (MatchResult match : matches) {
             for (Candy candy : match.getMatchedCandies()) {
                 if (candy != null && board.getCandy(candy.getRow(), candy.getCol()) != null) {
-                    score += 10;
+                    scoreManager.addScore(10);
                     board.setCandy(candy.getRow(), candy.getCol(), null);
                     if (candy.getSpecialType() != main.model.enums.SpecialType.NONE) {
                         specialCandyLogic.activateSpecialCandy(board, candy);
@@ -201,8 +177,5 @@ public class GameManager {
         }
     }
 
-    public int getSelectedRow() { return selectedRow; }
-    public int getSelectedCol() { return selectedCol; }
     public Board getBoard() { return board; }
-    public int getScore() { return score; }
 }
