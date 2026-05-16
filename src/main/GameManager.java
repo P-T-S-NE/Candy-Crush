@@ -30,9 +30,9 @@ public class GameManager {
     private final IGameState fallingState = new FallingState();
 
     private Board board;
-    private IMatchLogic matchLogic;
-    private IGravityLogic gravityLogic;
-    private ISpecialCandyLogic specialCandyLogic;
+    private final IMatchLogic matchLogic;
+    private final IGravityLogic gravityLogic;
+    private final ISpecialCandyLogic specialCandyLogic;
     private AnimationSystem animationSystem;
     private ScoreManager scoreManager = ScoreManager.getInstance();
     private Runnable repaintCallback;

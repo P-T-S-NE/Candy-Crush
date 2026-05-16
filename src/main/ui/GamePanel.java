@@ -10,6 +10,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.BasicStroke;
 import java.awt.Color;
+import main.ui.renderer.SpecialCandyRendererRegistry;
 
 public class GamePanel extends JPanel {
     private GameManager gameManager;
@@ -77,7 +78,7 @@ public class GamePanel extends JPanel {
         g.setColor(new Color(255, 255, 255, 100));
         g.fillOval(x + padding + 5, y + padding + 5, 15, 10);
 
-        main.ui.renderer.SpecialCandyRendererRegistry.getInstance().render(candy.getSpecialType(), g, x, y, CELL_SIZE, padding);
+        SpecialCandyRendererRegistry.getInstance().render(candy.getSpecialType(), g, x, y, CELL_SIZE, padding);
     }
 
     private void drawSelector(Graphics g) {
