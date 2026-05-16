@@ -13,15 +13,14 @@ import java.awt.Color;
 
 public class GamePanel extends JPanel {
     private GameManager gameManager;
-    private ScoreManager scoreManager;
+    private ScoreManager scoreManager = ScoreManager.getInstance();
     private SelectionController selectionController;
     public static final int CELL_SIZE = 60;
     public static final int OFFSET_X = 50;
     public static final int OFFSET_Y = 50;
 
-    public GamePanel(GameManager gameManager, ScoreManager scoreManager, SelectionController selectionController) {
+    public GamePanel(GameManager gameManager, SelectionController selectionController) {
         this.gameManager = gameManager;
-        this.scoreManager = scoreManager;
         this.selectionController = selectionController;
     }
 
@@ -78,7 +77,7 @@ public class GamePanel extends JPanel {
         g.setColor(new Color(255, 255, 255, 100));
         g.fillOval(x + padding + 5, y + padding + 5, 15, 10);
 
-        main.ui.renderer.SpecialCandyRendererRegistry.render(candy.getSpecialType(), g, x, y, CELL_SIZE, padding);
+        main.ui.renderer.SpecialCandyRendererRegistry.getInstance().render(candy.getSpecialType(), g, x, y, CELL_SIZE, padding);
     }
 
     private void drawSelector(Graphics g) {

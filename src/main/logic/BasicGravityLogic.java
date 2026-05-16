@@ -8,10 +8,9 @@ import java.util.List;
 
 public class BasicGravityLogic implements IGravityLogic {
 
-    private CandyFactory candyFactory;
+    private CandyFactory candyFactory = CandyFactory.getInstance();
 
-    public BasicGravityLogic(CandyFactory candyFactory) {
-        this.candyFactory = candyFactory;
+    public BasicGravityLogic() {
     }
 
     @Override

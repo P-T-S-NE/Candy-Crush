@@ -4,6 +4,16 @@ import main.model.enums.CandyType;
 import main.model.enums.SpecialType;
 
 public class CandyFactory {
+    private static CandyFactory instance;
+
+    private CandyFactory() {}
+
+    public static CandyFactory getInstance() {
+        if (instance == null) {
+            instance = new CandyFactory();
+        }
+        return instance;
+    }
     
     public Candy createRandomCandy(int row, int col) {
         CandyType[] types = CandyType.values();

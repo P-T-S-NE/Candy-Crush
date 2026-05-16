@@ -13,32 +13,39 @@ import main.logic.BasicSpecialCandyLogic;
 import main.animation.AnimationSystem;
 import main.animation.SwapAnimation;
 import main.animation.FallAnimation;
+import main.state.IGameState;
+import main.state.IdleState;
+import main.state.SwappingState;
+import main.state.RevertingState;
+import main.state.MatchingState;
+import main.state.FallingState;
 import javax.swing.Timer;
 import java.util.List;
 
 public class GameManager {
-    public enum GameState {
-        IDLE, SWAPPING, REVERTING, MATCHING, FALLING
-    }
+    private final IGameState idleState = new IdleState();
+    private final IGameState swappingState = new SwappingState();
+    private final IGameState revertingState = new RevertingState();
+    private final IGameState matchingState = new MatchingState();
+    private final IGameState fallingState = new FallingState();
 
     private Board board;
     private IMatchLogic matchLogic;
     private IGravityLogic gravityLogic;
     private ISpecialCandyLogic specialCandyLogic;
     private AnimationSystem animationSystem;
-    private ScoreManager scoreManager;
+    private ScoreManager scoreManager = ScoreManager.getInstance();
     private Runnable repaintCallback;
-    private GameState state = GameState.IDLE;
+    private IGameState state = idleState;
     private Timer gameLoop;
     
     private int swapR1, swapC1, swapR2, swapC2;
 
-    public GameManager(IMatchLogic matchLogic, IGravityLogic gravityLogic, ISpecialCandyLogic specialCandyLogic, ScoreManager scoreManager) {
+    public GameManager(IMatchLogic matchLogic, IGravityLogic gravityLogic, ISpecialCandyLogic specialCandyLogic) {
         this.board = new Board(8, 8);
         this.matchLogic = matchLogic;
         this.gravityLogic = gravityLogic;
         this.specialCandyLogic = specialCandyLogic;
-        this.scoreManager = scoreManager;
         this.animationSystem = new AnimationSystem();
     }
 
@@ -82,42 +89,13 @@ public class GameManager {
             return;
         }
 
-        switch (state) {
-            case SWAPPING:
-                List<MatchResult> matches = matchLogic.findMatches(board);
-                if (matches.isEmpty()) {
-                    board.swap(swapR1, swapC1, swapR2, swapC2);
-                    Candy c1 = board.getCandy(swapR1, swapC1);
-                    Candy c2 = board.getCandy(swapR2, swapC2);
-                    animationSystem.addAnimation(new SwapAnimation(c1, c2, 0.2f));
-                    state = GameState.REVERTING;
-                } else {
-                    state = GameState.MATCHING;
-                }
-                break;
-            case REVERTING:
-                state = GameState.IDLE;
-                break;
-            case MATCHING:
-                List<MatchResult> currentMatches = matchLogic.findMatches(board);
-                if (!currentMatches.isEmpty()) {
-                    processMatches(currentMatches);
-                    state = GameState.FALLING;
-                    refillAndAnimate();
-                } else {
-                    state = GameState.IDLE;
-                }
-                break;
-            case FALLING:
-                state = GameState.MATCHING;
-                break;
-            case IDLE:
-                break;
+        if (state != null) {
+            state.update(this);
         }
         if (repaintCallback != null) repaintCallback.run();
     }
 
-    private void refillAndAnimate() {
+    public void refillAndAnimate() {
         gravityLogic.applyGravity(board);
         
         for (int r = 0; r < board.getRows(); r++) {
@@ -140,7 +118,7 @@ public class GameManager {
     }
 
     public boolean isIdle() {
-        return state == GameState.IDLE;
+        return state == idleState;
     }
 
     public void handleSwap(int r1, int c1, int r2, int c2) {
@@ -154,7 +132,7 @@ public class GameManager {
 
         board.swap(r1, c1, r2, c2);
         animationSystem.addAnimation(new SwapAnimation(c1Obj, c2Obj, 0.2f));
-        state = GameState.SWAPPING;
+        setState(swappingState);
     }
 
     public void processMatches(List<MatchResult> matches) {
@@ -178,4 +156,16 @@ public class GameManager {
     }
 
     public Board getBoard() { return board; }
+    public IMatchLogic getMatchLogic() { return matchLogic; }
+    public AnimationSystem getAnimationSystem() { return animationSystem; }
+    public int getSwapR1() { return swapR1; }
+    public int getSwapC1() { return swapC1; }
+    public int getSwapR2() { return swapR2; }
+    public int getSwapC2() { return swapC2; }
+    public IGameState getIdleState() { return idleState; }
+    public IGameState getSwappingState() { return swappingState; }
+    public IGameState getRevertingState() { return revertingState; }
+    public IGameState getMatchingState() { return matchingState; }
+    public IGameState getFallingState() { return fallingState; }
+    public void setState(IGameState state) { this.state = state; }
 }

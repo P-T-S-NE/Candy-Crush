@@ -7,9 +7,10 @@ import java.util.EnumMap;
 import java.util.Map;
 
 public class SpecialCandyRendererRegistry {
-    private static final Map<SpecialType, ISpecialEffectRenderer> renderers = new EnumMap<>(SpecialType.class);
+    private static SpecialCandyRendererRegistry instance;
+    private final Map<SpecialType, ISpecialEffectRenderer> renderers = new EnumMap<>(SpecialType.class);
 
-    static {
+    private SpecialCandyRendererRegistry() {
         renderers.put(SpecialType.STRIPED_HORIZONTAL, (g, x, y, cellSize, padding) -> {
             g.setColor(Color.WHITE);
             g.fillRect(x + padding, y + cellSize / 2 - 2, cellSize - 2 * padding, 4);
@@ -27,14 +28,21 @@ public class SpecialCandyRendererRegistry {
         });
     }
 
-    public static void render(SpecialType type, Graphics g, int x, int y, int cellSize, int padding) {
+    public static SpecialCandyRendererRegistry getInstance() {
+        if (instance == null) {
+            instance = new SpecialCandyRendererRegistry();
+        }
+        return instance;
+    }
+
+    public void render(SpecialType type, Graphics g, int x, int y, int cellSize, int padding) {
         ISpecialEffectRenderer renderer = renderers.get(type);
         if (renderer != null) {
             renderer.draw(g, x, y, cellSize, padding);
         }
     }
     
-    public static void registerRenderer(SpecialType type, ISpecialEffectRenderer renderer) {
+    public void registerRenderer(SpecialType type, ISpecialEffectRenderer renderer) {
         renderers.put(type, renderer);
     }
 }

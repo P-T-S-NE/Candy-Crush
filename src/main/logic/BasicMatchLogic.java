@@ -11,10 +11,9 @@ import java.util.List;
 
 public class BasicMatchLogic implements IMatchLogic {
 
-    private CandyFactory candyFactory;
+    private CandyFactory candyFactory = CandyFactory.getInstance();
 
-    public BasicMatchLogic(CandyFactory candyFactory) {
-        this.candyFactory = candyFactory;
+    public BasicMatchLogic() {
     }
 
     @Override
