@@ -14,7 +14,7 @@ import main.ui.GamePanel;
 
 public class Main {
     public static void main(String[] args) {
-        IMatchLogic matchLogic = new BasicMatchLogic(); 
+        IMatchLogic matchLogic = new BasicMatchLogic();
         IGravityLogic gravityLogic = new BasicGravityLogic();
         ISpecialCandyLogic specialCandyLogic = new BasicSpecialCandyLogic();
         SwingUtilities.invokeLater(() -> {
@@ -37,6 +37,7 @@ public class Main {
 
             try {
                 gameManager.start();
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
