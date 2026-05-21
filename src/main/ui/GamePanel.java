@@ -41,9 +41,9 @@ public class GamePanel extends JPanel {
         if (board == null)
             return;
 
-        g.setColor(new Color(60, 60, 60));
         for (int r = 0; r < board.getRows(); r++) {
             for (int c = 0; c < board.getCols(); c++) {
+                g.setColor(new Color(60, 60, 60));
                 g.fillRect(OFFSET_X + c * CELL_SIZE, OFFSET_Y + r * CELL_SIZE, CELL_SIZE, CELL_SIZE);
                 g.setColor(new Color(80, 80, 80));
                 g.drawRect(OFFSET_X + c * CELL_SIZE, OFFSET_Y + r * CELL_SIZE, CELL_SIZE, CELL_SIZE);
