@@ -5,6 +5,7 @@ import main.model.Candy;
 import main.model.enums.CandyType;
 import main.model.enums.SpecialType;
 import main.logic.ISpecialCandyLogic;
+import main.logic.ICandyDestroyListener;
 import java.util.EnumMap;
 import java.util.Map;
 
@@ -13,7 +14,7 @@ public class SpecialEffectRegistry {
     private final Map<SpecialType, ISpecialEffectStrategy> strategies = new EnumMap<>(SpecialType.class);
 
     private SpecialEffectRegistry() {
-        strategies.put(SpecialType.STRIPED_HORIZONTAL, (board, candy, logic) -> {
+        strategies.put(SpecialType.STRIPED_HORIZONTAL, (board, candy, logic, listener) -> {
             int row = candy.getRow();
             board.setCandy(candy.getRow(), candy.getCol(), null);
             for (int c = 0; c < board.getCols(); c++) {
@@ -27,7 +28,7 @@ public class SpecialEffectRegistry {
             }
         });
 
-        strategies.put(SpecialType.STRIPED_VERTICAL, (board, candy, logic) -> {
+        strategies.put(SpecialType.STRIPED_VERTICAL, (board, candy, logic, listener) -> {
             int col = candy.getCol();
             board.setCandy(candy.getRow(), candy.getCol(), null);
             for (int r = 0; r < board.getRows(); r++) {
@@ -41,7 +42,7 @@ public class SpecialEffectRegistry {
             }
         });
 
-        strategies.put(SpecialType.WRAPPED, (board, candy, logic) -> {
+        strategies.put(SpecialType.WRAPPED, (board, candy, logic, listener) -> {
             int row = candy.getRow();
             int col = candy.getCol();
             board.setCandy(candy.getRow(), candy.getCol(), null);
