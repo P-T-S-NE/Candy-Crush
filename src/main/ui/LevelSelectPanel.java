@@ -66,17 +66,27 @@ public class LevelSelectPanel extends JPanel {
     private Rectangle getLevelButtonBounds(int level) {
         int w = getWidth();
         int h = getHeight();
-        int btnWidth = w / 5;
-        int btnHeight = h / 5;
-        int spacing = w / 10;
-        
-        // Center horizontally
-        int totalWidth = (btnWidth * 3) + (spacing * 2);
-        int startX = (w - totalWidth) / 2;
-        int btnY = h / 2; // Roughly center vertically
-        
-        int btnX = startX + (level - 1) * (btnWidth + spacing);
-        return new Rectangle(btnX, btnY, btnWidth, btnHeight);
+
+        int size = Math.min(w, h) / 6;
+
+        int x = 0;
+
+        // hạ thấp xuống đúng tâm quả bóng
+        int y = (int)(h * 0.55);
+
+        switch (level) {
+            case 1:
+                x = (int)(w * 0.28);
+                break;
+            case 2:
+                x = (int)(w * 0.50);
+                break;
+            case 3:
+                x = (int)(w * 0.75);
+                break;
+        }
+
+        return new Rectangle(x - size / 2, y - size / 2, size, size);
     }
 
     @Override
@@ -102,31 +112,46 @@ public class LevelSelectPanel extends JPanel {
             String scoreText = "Score: " + score;
             java.awt.FontMetrics fm = g.getFontMetrics();
             int textWidth = fm.stringWidth(scoreText);
-            
+
+            int centerX = r.x + r.width / 2;
+
+            // đưa score xuống gần quả bóng hơn
+            int scoreY = r.y - 40;
+
             g.setColor(new java.awt.Color(0, 0, 0, 150));
-            g.fillRect(r.x + (r.width - textWidth) / 2 - 10, r.y - 45, textWidth + 20, 30);
-            
+            g.fillRoundRect(centerX - textWidth / 2 - 10,
+                    scoreY,
+                    textWidth + 20,
+                    30,
+                    15,
+                    15);
+
             g.setColor(java.awt.Color.WHITE);
-            g.drawString(scoreText, r.x + (r.width - textWidth) / 2, r.y - 23);
-            
-            // Cover background stars
-            int starsY = r.y + r.height + 5;
-            g.setColor(new java.awt.Color(0, 0, 0, 180));
-            g.fillRoundRect(r.x - 10, starsY, r.width + 20, 40, 20, 20);
-            
-            // Draw custom stars
-            int cx = r.x + r.width / 2;
-            int cy = starsY + 20;
+            g.drawString(scoreText,
+                    centerX - textWidth / 2,
+                    scoreY + 21);
+
+            // Stars
+            // đặt dưới quả bóng thay vì đè lên
+            int starsY = r.y + r.height + 10;
+
+            g.setColor(new java.awt.Color(0, 0, 0, 160));
+            g.fillRoundRect(centerX - 90, starsY, 180, 35, 18, 18);
+
+            int cy = starsY + 17;
             int spacing = 35;
-            
+
             for (int s = 0; s < 3; s++) {
-                int starCx = cx + (s - 1) * spacing;
+                int starCx = centerX + (s - 1) * spacing;
+
                 boolean isEarned = s < stars;
+
                 g2d.setColor(isEarned ? java.awt.Color.YELLOW : java.awt.Color.GRAY);
-                drawStar(g2d, starCx, cy, 14, isEarned);
+                drawStar(g2d, starCx, cy, 12, isEarned);
+
                 if (!isEarned) {
                     g2d.setColor(java.awt.Color.LIGHT_GRAY);
-                    drawStar(g2d, starCx, cy, 14, false); // Draw outline for empty star
+                    drawStar(g2d, starCx, cy, 12, false);
                 }
             }
         }
