@@ -21,9 +21,7 @@ public class SpecialEffectRegistry {
                 Candy target = board.getCandy(row, c);
                 if (target != null) {
                     board.setCandy(row, c, null);
-                    if (target.getSpecialType() != SpecialType.NONE && target != candy) {
-                        logic.activateSpecialCandy(board, target, listener);
-                    }
+                    listener.onSecondaryCandyDestroyed(target);
                 }
             }
         });
@@ -35,9 +33,7 @@ public class SpecialEffectRegistry {
                 Candy target = board.getCandy(r, col);
                 if (target != null) {
                     board.setCandy(r, col, null);
-                    if (target.getSpecialType() != SpecialType.NONE && target != candy) {
-                        logic.activateSpecialCandy(board, target, listener);
-                    }
+                    listener.onSecondaryCandyDestroyed(target);
                 }
             }
         });
@@ -52,9 +48,7 @@ public class SpecialEffectRegistry {
                         Candy target = board.getCandy(r, c);
                         if (target != null) {
                             board.setCandy(r, c, null);
-                            if (target.getSpecialType() != SpecialType.NONE && target != candy) {
-                                logic.activateSpecialCandy(board, target, listener);
-                            }
+                            listener.onSecondaryCandyDestroyed(target);
                         }
                     }
                 }
@@ -75,17 +69,9 @@ public class SpecialEffectRegistry {
                     
                     if (target != null && target.getType() == targetType && target != candy) {
                         
-                        // 3. Nếu là kẹo đặc biệt, kích hoạt logic của nó
-                        if (target.getSpecialType() != SpecialType.NONE) {
-                            // Mẹo: Cần xóa hoặc đánh dấu target ĐÃ NỔ trước khi gọi đệ quy 
-                            // để tránh các viên kẹo đặc biệt cùng loại gọi chéo nhau.
-                            Candy specialTarget = target;
-                            board.setCandy(r, c, null); // Xóa trên board trước
-                            logic.activateSpecialCandy(board, specialTarget, listener); // Rồi mới kích hoạt hiệu ứng
-                        } else {
-                            // Nếu là kẹo thường thì chỉ cần xóa
-                            board.setCandy(r, c, null);
-                        }
+                        Candy specialTarget = target;
+                        board.setCandy(r, c, null); // Xóa trên board trước
+                        listener.onSecondaryCandyDestroyed(specialTarget);
                     }
                 }
             }

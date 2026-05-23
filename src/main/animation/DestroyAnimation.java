@@ -11,6 +11,10 @@ public class DestroyAnimation extends Animation implements IParticleEffect {
     private static final Random random = new Random();
 
     public DestroyAnimation(Candy candy, boolean isSpecial) {
+        this(candy, isSpecial, false);
+    }
+
+    public DestroyAnimation(Candy candy, boolean isSpecial, boolean isLight) {
         this.particles = new ArrayList<>();
         Color color = candy.getType().getColor();
         // The visual coordinates are based on grid cells (0 to cols-1). 
@@ -18,19 +22,24 @@ public class DestroyAnimation extends Animation implements IParticleEffect {
         float startX = candy.getVisualX() + 0.5f;
         float startY = candy.getVisualY() + 0.5f;
         
-        int particleCount = isSpecial ? 60 : 25; // More particles for special candy
+        int particleCount;
+        if (isLight) particleCount = 10;
+        else particleCount = isSpecial ? 60 : 25;
         
         // Generate pixel particles
         for (int i = 0; i < particleCount; i++) {
             float angle = (float) (random.nextDouble() * Math.PI * 2);
             float speedMult = isSpecial ? 2.5f : 1.0f;
+            if (isLight) speedMult *= 0.8f;
             float speed = (random.nextFloat() * 0.15f + 0.05f) * speedMult; // Faster out from center if special
             float vx = (float) Math.cos(angle) * speed;
             float vy = (float) Math.sin(angle) * speed;
             float sizeMult = isSpecial ? 1.5f : 1.0f;
+            if (isLight) sizeMult *= 0.6f;
             float size = (random.nextFloat() * 0.25f + 0.1f) * sizeMult; // Bigger chunks if special
             float maxLife = random.nextFloat() * 20 + 15; // Frames (15 to 35 frames)
             if (isSpecial) maxLife += 15; // Longer duration for special
+            if (isLight) maxLife *= 0.6f;
             float rotation = random.nextFloat() * 360f;
             float rotationSpeed = (random.nextFloat() - 0.5f) * 20f;
             

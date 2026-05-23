@@ -151,9 +151,18 @@ public class GameManager implements ICandyDestroyListener {
 
     @Override
     public void onCandyDestroyed(Candy candy) {
+        handleCandyDestruction(candy, false);
+    }
+
+    @Override
+    public void onSecondaryCandyDestroyed(Candy candy) {
+        handleCandyDestruction(candy, true);
+    }
+
+    private void handleCandyDestruction(Candy candy, boolean isLight) {
         scoreManager.addScore(10);
         boolean isSpecial = candy.getSpecialType() != main.model.enums.SpecialType.NONE;
-        animationSystem.addAnimation(new main.animation.DestroyAnimation(candy, isSpecial));
+        animationSystem.addAnimation(new main.animation.DestroyAnimation(candy, isSpecial, isLight));
         
         if (isSpecial) {
             specialCandyLogic.activateSpecialCandy(board, candy, this);
