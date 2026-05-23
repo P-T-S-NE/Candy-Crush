@@ -1,11 +1,8 @@
 package main.logic.effects;
 
-import main.model.Board;
 import main.model.Candy;
 import main.model.enums.CandyType;
 import main.model.enums.SpecialType;
-import main.logic.ISpecialCandyLogic;
-import main.logic.ICandyDestroyListener;
 import java.util.EnumMap;
 import java.util.Map;
 
